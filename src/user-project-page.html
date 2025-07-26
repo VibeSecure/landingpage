@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Project Details - api-gateway</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-bg: #f8fafc;
+            --card-bg: #ffffff;
+            --text-primary: #1e293b;
+            --text-secondary: #64748b;
+            --border-color: #e2e8f0;
+            --online: #10b981;
+            --offline: #ef4444;
+            --warning: #f59e0b;
+            --pending: #3b82f6;
+            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+            --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+            --radius: 0.5rem;
+            --transition: all 0.3s ease;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background-color: var(--primary-bg);
+            color: var(--text-primary);
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem 1rem;
+        }
+
+        .back-nav {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--text-secondary);
+            text-decoration: none;
+            margin-bottom: 2rem;
+            transition: var(--transition);
+        }
+
+        .back-nav:hover {
+            color: var(--text-primary);
+        }
+
+        .project-header {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius);
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .project-header h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .status-badge {
+            padding: 0.5rem 1rem;
+            border-radius: var(--radius);
+            font-size: 0.875rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .status-badge.online {
+            background-color: rgba(16, 185, 129, 0.1);
+            color: var(--online);
+        }
+
+        .status-badge.offline {
+            background-color: rgba(239, 68, 68, 0.1);
+            color: var(--offline);
+        }
+
+        .status-badge.warning {
+            background-color: rgba(245, 158, 11, 0.1);
+            color: var(--warning);
+        }
+
+        .project-actions {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border-radius: var(--radius);
+            font-weight: 600;
+            text-decoration: none;
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            cursor: pointer;
+            border: none;
+        }
+
+        .btn-primary {
+            background: var(--online);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #059669;
+            transform: translateY(-1px);
+        }
+
+        .btn-secondary {
+            background: var(--card-bg);
+            color: var(--text-secondary);
+            border: 1px solid var(--border-color);
+        }
+
+        .btn-secondary:hover {
+            background: var(--primary-bg);
+            color: var(--text-primary);
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius);
+            padding: 1.5rem;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .card h2 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            color: var(--text-primary);
+        }
+
+        .info-grid {
+            display: grid;
+            gap: 1rem;
+        }
+
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.75rem 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .info-row:last-child {
+            border-bottom: none;
+        }
+
+        .info-label {
+            font-weight: 500;
+            color: var(--text-secondary);
+        }
+
+        .info-value {
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .platform-icon {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .chart-placeholder {
+            height: 200px;
+            background: var(--primary-bg);
+            border-radius: var(--radius);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-secondary);
+            margin-bottom: 1rem;
+        }
+
+        .activity-list {
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .activity-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.75rem;
+            border-radius: var(--radius);
+            margin-bottom: 0.5rem;
+            font-size: 0.875rem;
+        }
+
+        .activity-item:hover {
+            background: var(--primary-bg);
+        }
+
+        .activity-time {
+            color: var(--text-secondary);
+        }
+
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 48px;
+            height: 24px;
+        }
+
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: var(--border-color);
+            transition: var(--transition);
+            border-radius: 24px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 18px;
+            width: 18px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: var(--transition);
+            border-radius: 50%;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        input:checked + .slider {
+            background-color: var(--online);
+        }
+
+        input:checked + .slider:before {
+            transform: translateX(24px);
+        }
+
+        .settings-section {
+            margin-top: 2rem;
+        }
+
+        .danger-zone {
+            border: 1px solid var(--offline);
+            border-radius: var(--radius);
+            padding: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .danger-zone h3 {
+            color: var(--offline);
+            margin-bottom: 1rem;
+        }
+
+        .btn-danger {
+            background: var(--offline);
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #dc2626;
+            transform: translateY(-1px);
+        }
+
+        .pr-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem;
+            background: var(--primary-bg);
+            border-radius: var(--radius);
+            margin-bottom: 0.5rem;
+        }
+
+        .pr-info {
+            flex: 1;
+        }
+
+        .pr-title {
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .pr-status {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+        }
+
+        @media (max-width: 768px) {
+            .grid {
+                grid-template-columns: 1fr;
+            }
+
+            .project-header h1 {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .project-actions {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="/dashboard" class="back-nav">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="15 18 9 12 15 6"></polyline>
+            </svg>
+            Back to Dashboard
+        </a>
+
+        <div class="project-header">
+            <h1>
+                api-gateway
+                <span class="status-badge online">ONLINE</span>
+            </h1>
+            <div class="project-actions">
+                <a href="https://api-gateway.example.com" class="btn btn-primary" target="_blank">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                        <polyline points="15 3 21 3 21 9"></polyline>
+                        <line x1="10" y1="14" x2="21" y2="3"></line>
+                    </svg>
+                    Go to App
+                </a>
+                <button class="btn btn-secondary">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="3"></circle>
+                        <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+                    </svg>
+                    Configure
+                </button>
+            </div>
+        </div>
+
+        <div class="grid">
+            <div class="card">
+                <h2>Overview</h2>
+                <div class="info-grid">
+                    <div class="info-row">
+                        <span class="info-label">Deployment Platform</span>
+                        <span class="info-value">
+                            <span class="platform-icon">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                                    <path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm-2.5 16.5v-4.5h-2v-2h2V8.5c0-1.1.9-2 2-2h2v2h-2v2h2v2h-2v4.5h-2z"/>
+                                </svg>
+                                Heroku
+                            </span>
+                        </span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Main URL</span>
+                        <span class="info-value">
+                            <a href="https://api-gateway.example.com" target="_blank" style="color: var(--online);">
+                                api-gateway.example.com
+                            </a>
+                        </span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Last Successful Keep-Alive</span>
+                        <span class="info-value">2 minutes ago</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Last Update Attempt</span>
+                        <span class="info-value">Success - 2 minutes ago</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Next Scheduled Keep-Alive</span>
+                        <span class="info-value">in 3 minutes</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2>Keep-Alive & Status</h2>
+                <div class="chart-placeholder">
+                    <div style="text-align: center;">
+                        <div style="font-size: 2rem; margin-bottom: 0.5rem;">99.8%</div>
+                        <div style="color: var(--text-secondary);">Uptime (last 7 days)</div>
+                    </div>
+                </div>
+                <div class="activity-list">
+                    <div class="activity-item">
+                        <span>Keep-alive successful</span>
+                        <span class="activity-time">2 min ago</span>
+                    </div>
+                    <div class="activity-item">
+                        <span>Keep-alive successful</span>
+                        <span class="activity-time">5 min ago</span>
+                    </div>
+                    <div class="activity-item">
+                        <span>Keep-alive successful</span>
+                        <span class="activity-time">8 min ago</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="grid">
+            <div class="card">
+                <h2>Code Update Management</h2>
+                <div class="info-grid">
+                    <div class="info-row">
+                        <span class="info-label">Current Framework Version</span>
+                        <span class="info-value">Next.js v14.1.0</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Security Status</span>
+                        <span class="info-value" style="color: var(--online);">All clear</span>
+                    </div>
+                </div>
+
+                <h3 style="margin: 1.5rem 0 1rem;">Pending Pull Requests</h3>
+                <div class="pr-item">
+                    <div class="pr-info">
+                        <div class="pr-title">Update dependencies - security patch</div>
+                        <div class="pr-status">Ready to merge</div>
+                    </div>
+                    <a href="https://github.com/user/api-gateway/pull/42" target="_blank" class="btn btn-secondary">View PR</a>
+                </div>
+
+                <div style="display: flex; justify-content: space-between; align-items: center; margin: 1.5rem 0;">
+                    <span>Auto-merge for security updates</span>
+                    <label class="toggle-switch">
+                        <input type="checkbox" checked>
+                        <span class="slider"></span>
+                    </label>
+                </div>
+                <p style="font-size: 0.875rem; color: var(--text-secondary); margin-bottom: 1rem;">
+                    Auto-merge enabled for security updates
+                </p>
+
+                <button class="btn btn-primary" style="width: 100%;">Review & Merge Now</button>
+            </div>
+
+            <div class="card">
+                <h2>Update History</h2>
+                <div class="activity-list">
+                    <div class="activity-item">
+                        <div>
+                            <div style="font-weight: 600;">Security update v14.1.0</div>
+                            <div style="font-size: 0.875rem; color: var(--text-secondary);">Success - 2 days ago</div>
+                        </div>
+                        <a href="#" style="color: var(--online); font-size: 0.875rem;">View PR</a>
+                    </div>
+                    <div class="activity-item">
+                        <div>
+                            <div style="font-weight: 600;">Dependency update</div>
+                            <div style="font-size: 0.875rem; color: var(--text-secondary);">Success - 1 week ago</div>
+                        </div>
+                        <a href="#" style="color: var(--online); font-size: 0.875rem;">View PR</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="settings-section">
+            <div class="card">
+                <h2>Settings</h2>
+                <div class="info-grid">
+                    <div class="info-row">
+                        <span class="info-label">GitHub Integration</span>
+                        <span class="info-value" style="color: var(--online);">Connected</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Heroku API Token</span>
+                        <span class="info-value" style="color: var(--online);">Connected</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Email Notifications</span>
+                        <label class="toggle-switch">
+                            <input type="checkbox" checked>
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Slack Notifications</span>
+                        <label class="toggle-switch">
+                            <input type="checkbox">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="danger-zone">
+                <h3>⚠ Danger Zone</h3>
+                <p style="color: var(--text-secondary); margin-bottom: 1rem;">
+                    Once you delete a project, there is no going back. Please be certain.
+                </p>
+                <button class="btn btn-danger">Delete Project</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Auto-merge toggle functionality
+        document.querySelector('input[type="checkbox"]').addEventListener('change', function() {
+            const statusText = this.parentElement.parentElement.nextElementSibling;
+            if (this.checked) {
+                statusText.textContent = 'Auto-merge enabled for security updates';
+            } else {
+                statusText.textContent = 'Manual approval required for updates';
+            }
+        });
+
+        // Delete project confirmation
+        document.querySelector('.btn-danger').addEventListener('click', function() {
+            if (confirm('Are you sure you want to delete this project? This action cannot be undone.')) {
+                alert('Project deletion initiated...');
+            }
+        });
+
+        // Review & Merge button
+        document.querySelector('.btn-primary').addEventListener('click', function() {
+            alert('Merging security update...');
+            setTimeout(() => {
+                alert('Security update merged successfully!');
+            }, 1000);
+        });
+    </script>
+</body>
+</html>
